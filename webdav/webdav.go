@@ -101,6 +101,15 @@ func (c *Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var PathOffset = r.Header.Get("X-Webdav-Offset")
+	var Path = r.URL.Path
+
+	if PathOffset != "" && strings.HasPrefix(Path, PathOffset) {
+		Path = Path[len(PathOffset):]
+	}
+
+	r.URL.Path = Path
+
 	// Checks for user permissions relatively to this PATH.
 	if !u.Allowed(r.URL.Path) {
 		w.WriteHeader(http.StatusForbidden)
